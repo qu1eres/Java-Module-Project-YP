@@ -1,5 +1,5 @@
-import android.provider.Settings;
-
+import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -24,40 +24,34 @@ public class Main {
 
         System.out.println("Данные автомобилей успешно введены!");
 
-        Car winner = Race.findWinner(car1, car2, car3);
-        System.out.println("Победитель в гонке: " + winner.name);
+        List<Car> winners = Race.findWinner(car1, car2, car3);
+
+        if (winners.size() == 1) {
+            System.out.println("Победитель в гонке: " + winners.getFirst().name);
+        } else {
+            System.out.println("Победители в гонке: ");
+            for (Car winner : winners) {
+                System.out.println(winner.name);
+            }
+        }
     }
 
     private static int getSpeed(Scanner scanner, String carNumber) {
         int speed;
         while (true) {
             System.out.println("Введите скорость (только целое число от 0 до 250) для " + carNumber + ":");
-            speed = scanner.nextInt();
-            if (speed < 0 || speed > 250) {
-                System.out.println("Введена некорректная скорость.");
-            } else {
-                break;
+            try {
+                speed = scanner.nextInt();
+                if (speed < 0 || speed > 250) {
+                    System.out.println("Введена некорректная скорость. Пожалуйста, введите значение от 0 до 250.");
+                } else {
+                    break;
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Ошибка: Введено не целое число. Пожалуйста, введите целое число.");
+                scanner.next();
             }
         }
         return speed;
-    }
-}
-
-class Car {
-    String name;
-    int speed;
-}
-
-// Я решил отказаться от расчёта пройденного расстояния, т.к. победитель всегда будет 1, внезависимости от того, по какому критерию выбирается победитель, по расстоянию или скорости, ведь умножение наибольшей скорости на 24 всегда выдаст наибольшее расстояние среди остальных.
-class Race {
-    public static Car findWinner(Car car1, Car car2, Car car3){
-        if (car1.speed > car2.speed && car1.speed > car3.speed) {
-            return car1;
-        } else if (car2.speed > car1.speed && car2.speed > car3.speed) {
-            return car2;
-        }
-        else {
-            return car3;
-        }
     }
 }
